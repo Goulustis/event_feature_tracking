@@ -67,6 +67,12 @@ if ~params.do_tracking
     params.debug = 0;
 end
 
+[dirpath, basename, ~] = fileparts(params.data_path);
+track_f = fullfile(dirpath, basename + '_track.csv');
+fid = fopen(track_f, 'w');
+fprintf(fid, '%s,%s,%s,%s\n', 'x', 'y', 't', 'id');
+fclose(fid);
+
 if params.debug
     params.do_parallel = 0;
 end
@@ -361,8 +367,27 @@ while event_iter < events_end
                 'MarkerEdgeColor', 'w');
             hold off
         end
-        pause(0.001)
+        % pause(0.001)
+
+        % % Directory where the files are saved
+        % directory = '../event_data/track_boxes_6dof';
+        % files = dir(fullfile(directory, '*.png')); % List all PNG files in the directory
+        % num_files = length(files); % Count how many PNG files are there
+
+        % % Create the filename with zero-padded number, formatted to 5 digits
+        % filename = fullfile(directory, sprintf('image_%05d.png', num_files));
+
+        % % Save the figure to a file
+        % saveas(image_fig, filename);  % Save as PNG file
     end
+
+    % Write to file
+    val_cond = is_valid > 0;
+    val_feat_pos = feature_positions(:, val_cond);
+    val_ids = ids(val_cond);
+    val_t = (events_zeroed(3,event_iter) + event_t0)*0.5; % shift back to original time
+    val_result = [val_feat_pos' repmat(val_t, length(val_ids), 1) val_ids'];
+    writematrix(val_result, track_f, 'Delimiter', ',', 'WriteMode', 'append');
    
     last_event_iter = event_iter+1;
     event_t0 = events_zeroed(3, event_iter);
