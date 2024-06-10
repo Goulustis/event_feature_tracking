@@ -2,3 +2,11 @@
 *#*
 *.bag
 *.mat
+*.png
+*.txt
+*.zip
+*.csv
+matlab_rosbag-0.5.0-linux64/*
+*.*5
+*.mp4
+*.pyc
